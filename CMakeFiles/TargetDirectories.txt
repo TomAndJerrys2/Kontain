@@ -1,3 +1,0 @@
-/home/kyle/Projects/Kontain/CMakeFiles/kontain.dir
-/home/kyle/Projects/Kontain/CMakeFiles/edit_cache.dir
-/home/kyle/Projects/Kontain/CMakeFiles/rebuild_cache.dir
