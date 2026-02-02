@@ -8,7 +8,6 @@
 #include <grp.h>
 #include <pwd.h>
 #include <sched.h>
-#include <seccomp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
