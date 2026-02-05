@@ -35,5 +35,34 @@ int main(int argc, char **argv) {
     last_optiond = optind;
   }
 
+	finish_options:
+		if(!config.argc) goto usage;
+		if(!config.mount_dir) goto usage;	
+	
+		// todo
+		check_linux();
+
+		char hostname[256] = {0};
+		if(choose_hostname(hostname, sizeof(hostname)) goto error;
+
+		config.hostname = hostname;
+		
+		// todo
+		call_namespace();
+
+		goto cleanup;
+
+  usage:
+		fprintf(stderr, "Kontain >> Usage: %s -u/-l/-m/./-c /bin/sh ~\n", argv[0]);
+
+	error:
+		err = 1;
+
+  cleanup:
+		if(sockets[0]) close(sockets[0]);
+		if(sockets[1]) close(sockets[1]);
+
+		return err;
+
   return 0;
 }
