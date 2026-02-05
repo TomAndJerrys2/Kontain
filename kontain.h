@@ -48,6 +48,8 @@ typedef struct child_config {
 } ChildConfig;
 
 void check_linux(void);
+void check_hostname(int*, const size_t);
+void check_namespace(void);
 
 #undef SOCKET_SIZE
 #endif

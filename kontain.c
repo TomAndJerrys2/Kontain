@@ -35,6 +35,8 @@ int main(int argc, char **argv) {
     last_optiond = optind;
   }
 
+  // the gotos here are technically unsafe jumps - will improve upon this late
+  // with function ptrs
 	finish_options:
 		if(!config.argc) goto usage;
 		if(!config.mount_dir) goto usage;	
@@ -48,7 +50,7 @@ int main(int argc, char **argv) {
 		config.hostname = hostname;
 		
 		// todo
-		call_namespace();
+		check_namespaces();
 
 		goto cleanup;
 
@@ -67,6 +69,9 @@ int main(int argc, char **argv) {
   return 0;
 }
 
+// Checks the linux kernel version against the current system
+// version - will in future provide autmatic updates for lower/
+// higher version of the linux kernel for portability
 void check_linux(void) {
 	fprintf(stderr, "=> Validating Linux Kernel Version...");
 
@@ -95,4 +100,17 @@ void check_linux(void) {
 	}
 
 	fprintf(stderr, "%s > %s\n", host.release, host.machine);
+}
+
+// declares hostname based on the span passed and chooses
+// from static instances of prenamed machine hosts
+int choose_hostname(char* buffer, const size_t length) {
+	static const char* suits[] = {};
+	static const char* minor[] = {};
+	static const char* major[] = {};
+
+	struct time_spec now = {0};
+
+	clock_get_time(CLOCK_MONOTONIC, &now);
+	size_t now_spec = now.tv_nsec % 78;
 }
