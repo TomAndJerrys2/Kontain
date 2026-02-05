@@ -47,7 +47,8 @@ typedef struct child_config {
 
 } ChildConfig;
 
-#undef SOCKET_SIZE
+void check_linux(void);
 
+#undef SOCKET_SIZE
 #endif
 

@@ -66,3 +66,33 @@ int main(int argc, char **argv) {
 
   return 0;
 }
+
+void check_linux(void) {
+	fprintf(stderr, "=> Validating Linux Kernel Version...");
+
+	struct machine_name host  = {0};
+
+	if(uname(&host)) {
+		fprintf(stderr, "Failed > %m\n");
+		goto cleanup;
+	}	
+
+	int major = -1, minor = -1;	
+
+	if(sscanf(host.release, "%u.%u.", &major, &minor) != 2) {
+		fprintf(stderr, "Release format not accepted > %s\n", host.release);
+		goto cleanup;
+	}
+
+	if(major != 4 || (minor != 7 && minor != 8)) {
+		fprintf(stderr, "Expected 4.7.X or 4.8.X > %s\n", host.release);
+		goto cleanup;
+	}
+
+	if(strcmp("x86_64", host.machine)) {
+		fprintf(stderr, "Expected Architecure: x86_64 got > %s\n", host.machine);
+		goto cleanup;
+	}
+
+	fprintf(stderr, "%s > %s\n", host.release, host.machine);
+}
