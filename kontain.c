@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
 
   // the gotos here are technically unsafe jumps - will improve upon this late
   // with function ptrs
-	finish_options:
+	finish_options: 
 		if(!config.argc) goto usage;
 		if(!config.mount_dir) goto usage;	
 	
@@ -49,11 +49,20 @@ int main(int argc, char **argv) {
 
 		config.hostname = hostname;
 		
-		// todo
-		check_namespaces();
+		if(socketpair(AF_LOCAL, SOCK_SEQPACKET, 0, sockets)) { 
+			fprintf(stderr, "SocketPairs failed: %m\n");
+			goto error;
+		} 
+
+		if(fcntl(sockets[0], F_SETFID, FD_CLOEXEC)) {
+			fprintf(stderr, "FNCTL failed: %m\n");
+			goto error;
+		}
+
+		config.fd = sockets[1];
 
 		goto cleanup;
-
+		
   usage:
 		fprintf(stderr, "Kontain >> Usage: %s -u/-l/-m/./-c /bin/sh ~\n", argv[0]);
 
