@@ -113,4 +113,15 @@ int choose_hostname(char* buffer, const size_t length) {
 
 	clock_get_time(CLOCK_MONOTONIC, &now);
 	size_t now_spec = now.tv_nsec % 78;
+
+	if(ix < sizeof(major) / sizeof(*major))
+		snprintf(buffer, length, "%051x-%s", now.tv_sec, major[ix]);
+	else {
+		ix -= sizeof(major) / sizeof(*major);
+		snprintf(buffer, length, "%051x-%s-of-%s", 
+				now.tv_sec, minor[ix % (sizeof(minor) / sizeof(*minor))], 
+					    suits[ix % (sizeof(minor) / sizeof(*minor))]);
+	}
+
+	return 0;
 }
