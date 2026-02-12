@@ -265,3 +265,28 @@ int userns(const ChildConfig * config) {
 	fprintf(stderr, "> Done\n");
 	return 0;
 }
+
+int child(void * arg) {
+	ChildConfig* config = arg;
+	
+	if(sethostname(config->hostname, strlen(config->hostname))
+			|| mounts(config)
+			|| userns(config)
+			|| capabilities()
+			|| syscalls()) {
+		close(config->fd);
+		return -1;
+	}
+
+	if(close(config->fd)) {
+		fprintf(stderr, "> Close failed: %m\n");
+		return -1;
+	}
+
+	if(execve(config->argv[0], config->argv, NULL)) {
+		fprintf(stderr, "> Execve failed: %m\n");
+		return -1;
+	}
+
+	return 0;
+}
