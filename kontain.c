@@ -231,3 +231,37 @@ int handle_child_uid(pid_t child_pid, int fd) {
 
 	return 0;
 }
+
+int userns(const ChildConfig * config) {
+	fprintf(stderr, "> Trying a user namespace...\n");
+	int has_userns = !unshare(CLONE_NEWUSER);
+
+	if(write(config->fd, &has_userns, sizeof has_userns) != sizeof has_userns) {
+		fprintf(stderr, "> Couldn't write: %m\n");
+		return -1;
+	}
+
+	int result = 0;
+	if(read(config->fd, &result, sizeof result) != sizeof result) {
+		fprintf(stderr, "Couldn't read: %m\n");
+		return -1;
+	}	
+
+	if(result)
+		return -1;
+
+	if(has_userns)
+		fprintf(stderr, "> Done\n");
+	else
+		fprintf(stderr, "> Unsupported action. Continuing\n");
+
+	fprintf(stderr, "> Switching to uid %d / gid %d", config->uid, config->uid);
+	if(setgroups(1, & (gid_t) {config->uid}) || setresgid(config->uid, config->uid, config->uid)
+			|| setresuid(config->uid, config->uid, config->uid)) {
+		fprintf(stderr, "%m\n");
+		return -1;
+	}
+
+	fprintf(stderr, "> Done\n");
+	return 0;
+}
