@@ -52,7 +52,17 @@ finish_options:
 
   config.hostname = hostname;
  
-  check_namespace(sockets, SOCKET_SIZE);
+  check_namespace(sockets, SOCKET_SIZE, config, child_pid);
+
+  if(resources(&config))
+    err = -1
+
+  int flags = CLONE_NEWNS
+            | CLONE_NEWCGROUP
+	    | CLONE_NEWPID
+	    | CLONE_NEWIPC
+	    | CLONE_NEWNET
+	    | CLONE_NEWUTS;
 
   goto cleanup;
 		
@@ -107,6 +117,10 @@ void check_linux(void) {
   fprintf(stderr, "%s > %s\n", host.release, host.machine);
 }
 
+const char* catch_exception(const char* msg) {
+	// todo....
+}
+
 // declares hostname based on the span passed and chooses
 // from static instances of prenamed machine hosts
 int choose_hostname(char *buffer, const size_t length) {
@@ -131,17 +145,89 @@ int choose_hostname(char *buffer, const size_t length) {
   return 0;
 }
 
-void check_namespace(const int *socket, const size_t ssize) {
-
-  if (socketpair(AF_LOCAL, SOCK_SEQPACKET, 0, sockets)) {
+void check_namespace(const int *socket, const size_t ssize
+		, const ChildConfig & config, const pid_t child_pid) {
+  
+  if (socketpair(AF_LOCAL, SOCK_SEQPACKET, 0, socket[ssize])) {
     fprintf(stderr, "SocketPairs failed: %m\n");
     goto error;
   }
 
-  if (fcntl(sockets[0], F_SETFID, FD_CLOEXEC)) {
+  if (fcntl(socket[0], F_SETFID, FD_CLOEXEC)) {
     fprintf(stderr, "FNCTL failed: %m\n");
     goto error;
   }
 
-  config.fd = sockets[1];
+  config.fd = socket[1];
+
+  #define STACK_SIZE (1024 * 1024)
+
+  char* stack = 0;
+  if(!(stack = (char*)malloc(STACK_SIZE))) {
+	fprintf(stderr, "> Failed to Allocate Stack Memory\n");
+	catch_exception("Out of Memory");
+  }
+
+  int flags = CLONE_NEWNS
+            | CLONE_NEWCGROUP
+	    | CLONE_NEWPID
+	    | CLONE_NEWIPC
+	    | CLONE_NEWNET
+	    | CLONE_NEWUTS;
+
+  if((child_pid = clone(child, stack + STACK_SIZE, flags | SIGCHILD, &config)) == -1) {
+	fprintf(stderr, "> Clone of Config failed %m\n");
+	err = 1;
+	catch_exception("Clone Failed");
+  }
+
+  close(sockets[1]);
+  sockets[1] = NULL;
+}
+
+int handle_child_uid(pid_t child_pid, int fd) {
+	int uid_map = 0;
+	int has_userns = -1;
+
+	if(read(fd, &has_userns, sizeof has_userns) != sizeof has_userns) {
+		fprintf(stderr, "> Couldn't read from child\n");
+		catch_exception("Child not Cloned\n");
+
+		return -1;
+	}	
+
+	if(has_userns) {
+		char path[PATH_MAX] = {0};
+
+		for(char** file = (char* []) {"uid_map", "gid_map", 0}; *file; file++) {
+			if(snprintf(path, sizeof path, "/proc/%d/%s", child_pid, *file) 
+					> sizeof path) {
+				fprintf(stderr, "> snprintf too big %m\n");
+				return -1;
+			}
+
+			fprintf(stderr, "> Writing %s...", path);
+
+			if((uid_map = open(path, O_WRONGLY)) == -1) {
+				fprintf(stderr, "> Failed to open: %m\n");
+				return -1;
+			}
+
+			if(dprintf(uid_map, "0 %d %d\n", USERNS_OFFSET, USERNS_COUNT) == -1) {
+				fprintf(stderr, "> dprintf failed: %m\n");
+				close(uid_map);
+
+				return -1;
+			}
+
+			close(uid_map;)
+		}
+	}
+
+	if(write(fd, & (int) {0}, sizeof int != sizeof int)) {
+		fprintf(stderr, "> Failed to write: %m\n");
+		return -1;
+	}
+
+	return 0;
 }

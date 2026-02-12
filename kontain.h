@@ -30,6 +30,9 @@
 #define KONTAIN_VERSION 1.0
 #define KONTAIN_ARCH "UNIX"
 
+#define USERNS_OFFSET 10000
+#define USERNS_COUNT 2000
+
 #define null (void*(0)) 
 #define SOCKET_SIZE 2
 
