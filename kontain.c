@@ -290,3 +290,58 @@ int child(void * arg) {
 
 	return 0;
 }
+
+int capabilities() {
+	fprintf(stderr, "> Dropping capabilities...\n");
+
+	int drop_caps[] = {
+		CAP_AUDIT_CONTROL,
+		CAP_AUDIT_READ,
+		CAP_AUDIT_WRITE,
+		
+		CAP_BLOCK_SUSPEND,
+		CAP_DAC_READ_SEARCH,
+		
+		CAP_FSETID,
+		CAP_IPC_LOCK,
+		CAP_MAC_ADMIN,
+		CAP_MAC_OVERRIDE,
+		CAP_MKNOD,
+		CAP_SETFCAP,
+		CAP_SYS_LOG,
+		CAP_SYS_ADMIN,
+		CAP_SYS_BOOT,
+		CAP_SYS_MODULE,
+		CAP_SYS_NICE,
+
+		CAP_SYS_RAWID,
+		CAP_SYS_RESOURCE,
+		CAP_SYS_TIME,
+		CAP_WAKE_ALARM
+	};
+
+	size_t n_caps = sizeof(drop_caps) / sizeof(*drop_caps);
+	fprintf(stderr, "Bounding...");
+	for(size_t i = 0; i < n_caps; ++i) {
+		if(prctl(PR_CAPBSET_DROP, drop_caps[i], 0, 0, 0)) {
+			fprintf(stderr, "> PRCTL Failed: %m\n");
+			return 1;
+		}
+	}
+
+	fprintf(stderr, "> Inheritable...");
+	caps_t caps = NULL;
+	if(!(caps = caps_get_proc()) || cap_set_flag(caps, CAP_INHERITABLE, n_caps, drop_caps, CAP_CLEAR) 
+			|| cap_set_proc(caps)) {
+
+		fprintf(stderr, "> Failed: %m\n");
+		if(caps)
+			cap_free(caps);
+
+		return 1;
+	}
+
+	cap_free(caps);
+	fprintf(stderr, "> Done!\n");
+	return 0;
+}
