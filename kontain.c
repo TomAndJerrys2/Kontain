@@ -345,3 +345,70 @@ int capabilities() {
 	fprintf(stderr, "> Done!\n");
 	return 0;
 }
+
+int mounts(const ChildConfig * config) {
+	fprintf(stderr, "> Remounting with MS_PRIVATE...\n");
+	
+	if(mount(NULL, "/", NULL, MS_REC | MS_PRIVATE, NULL)) {
+		fprintf(stderr, "> Failed to mount: %m\n");
+		return -1;
+	}
+
+	fprintf(stderr, "> Remounted\n");
+	fprintf(stderr, "> Making a temp directory to bind mount-point...\n");
+
+	char mount_dir[] = "/tmp/tmp.XXXXXX";
+	if(!mkdtemp(mount_dir)) {
+		fprintf(stderr, "> Failed making a dir\n");
+		return -1;
+	}
+
+	if(mount(config->mount_dir, mount_dir, NULL, MS_BIND | MS_PRIVATE, NULL)) {
+		fprintf(stderr, "> Bind Mount Failed\n");
+		return -1;
+	}
+
+	char inner_mount_dir[] = "/tmp/tmp.XXXXXX/oldroot.XXXXXX";
+	memcpy(inner_mount_dir, mount_dir, sizeof(mount_dir) -1);
+
+	if(!mkdtemp(inner_mount_dir)) {
+		fprintf(stderr, "> Failed making inner dir!\n");
+		return -1;
+	}
+
+	fprintf(stderr, "> Done\n");
+	fprintf(stderr, "> Pivoting root...\n");
+
+	if(pivot_root(mount_dir, inner_mount_dir)) {
+		fprintf(stderr, "> Failed\n");
+		return -1;
+	}
+
+	fprintf(stderr, "> Done\n");
+
+	char* old_root_dir = basename(inner_mount_dir);
+	char old_root[sizeof(inner_mount_dir) + 1] = {"/"};
+       	strcpy(&old_root[1], old_root_dir);
+
+	fprintf(stderr, "> UnMounting: %s\n", old_root);
+
+	if(chdir("/")) {
+		fprintf(stderr, "> ChDir failed: %m\n");
+		return -1;
+	}	
+
+	if(unmount2(old_root, MNT_DETACH)) {
+		fprintf(stderr, "> Unmount failed: %m\n");
+		return -1;
+	}
+
+	if(rmdir(old_root)) {
+		fprintf(stderr, "> rmdir failed: %m\n");
+		return -1;
+	}
+
+	fprintf(stderr, "> Done!\n");
+	return 0;
+}
+
+
