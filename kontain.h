@@ -54,6 +54,13 @@ void check_linux(void);
 void check_hostname(int*, const size_t);
 void check_namespace(void);
 
+int handle_child_uid(pid_t, int);
+int child(void *)
+int capabilities(void);
+int mounts(const ChildConfig *);
+int userns(const ChildConfig *);
+
+
 #undef SOCKET_SIZE
 #endif
 
