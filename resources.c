@@ -79,3 +79,60 @@ struct cgrp_control *cgrps[] = {
 
 	NULL
 };
+
+int resources(const ChildConfig * config) {
+	fprintf(stderr, "> Setting CGroups...\n");
+
+	for(struct cgrp_control** cgrp = cgrps; *cgrp; cgrp++) {
+		char dir[PATH_MAX] = {0};
+
+		fprintf(stderr, "%s...", (*cgrp)->control);
+		if(snprintf(dir, sizeof(dir), "/sys/fs/cgroup/%s/%s", 
+					(*cgrp)->control, config->hostname) == -1) {
+			return -1;
+		}
+
+		if(mkdir(dir, S_IRUSR | S_IWUSER | S_IXUSER)) {
+			fprintf(stderr, "mkdir %s failed: %m\n", dir);
+			return -1;
+		}
+
+		for(struct cgrp_setting** setting = (*cgrp)->settings; *setting; setting++) {
+			char path[PATH_MAX} = {0};
+			int fd = 0;
+
+			if(snprintf(path, sizeof(path), "%s/%s", dir, (*setting)->name) == -1) {
+				fprintf(stderr, "> snprintf failed: %m\n");
+				return -1;_
+			}
+
+			if((fd = open(path, O_WRONGLY)) == -1)  {
+				fprintf(stderr, "> Opening %s failed: %m\n", path);
+				return -1;
+			}
+
+			if(write(fd, (*setting)->value, strlen((*setting)->value)) == -1) {
+				fprintf(stderr, "> Writing to %s failed: %m\n", path);
+				close(fd);
+
+				return -1;
+			}
+
+			close(fd);
+		}
+	}
+
+	fprintf(stderr, "> Done\n");
+
+	fprintf(stderr, "> Setting rlimit...\n");
+	if(setrlimit(RLIMIT_NOFILE, &(struct rlimit) {
+		.rlim_max = FD_COUNT,
+		.rlim_cur = FD_COUNT		
+	})) {
+		fprintf(stderr, "> Failed: %m\n");
+		return 1;
+	}
+
+	fprintf(stderr, "> Done\n");
+	return 0;
+}
