@@ -1,10 +1,10 @@
 #define _GNU_SOURCE
-#define <stdio.h>
-#define <unistd.h>
-#define <sched.h>
-#define <sys/ioctl.h>
-#define <sys/socket.h>
-#define <linux/sockios.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sched.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <linux/sockios.h>
 
 int main(int argc, char** argv) {
 	if(unshare(CLONE_NEWUSER | CLONE_NEWNET)) {
