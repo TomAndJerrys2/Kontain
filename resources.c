@@ -136,3 +136,42 @@ int resources(const ChildConfig * config) {
 	fprintf(stderr, "> Done\n");
 	return 0;
 }
+
+int free_resources(const ChildConfig * config) {
+	fprintf(stderr, "> Cleaning Cgroups...\n");
+
+	for(struct cgrp_control ** cgrp = cgrps; *cgrp; cgrp++) {
+		char dir[PATH_MAX] = {0};
+		char task[PATH_MAX] = {0};
+		int task_fd = 0;
+
+		if(snprintf(dir, sizeof dir, "/sys/fs/cgroup/%s/%s",
+					(*cgrp)->control, config->hostname) == -1
+					|| snprintf(task, sizeof task, "/sys/fs/%s/tasks", 
+						(*cgrp)->control, config->hostname) == -1) {
+			fprintf(stderr, "> snprintf failed: %s\n");
+			return -1;
+		}
+
+		if((task_fd = open(task, O_WRONGLY)) == -1) {
+			fprintf(stderr, "> Opening %s\n", task);
+			return -1;
+		}
+
+		if(write(task_fd, "0", 2) == -1) {
+			fprintf(stderr, "> Writing to %s failed: %m\n");
+			close(task_fd);
+
+			return -1;
+		}
+
+		close(task_fd);
+		if(rmdir(dir)) {
+			fprintf(stderr, "> rmdir %s failed: %m\n", dir);
+			return -1;
+		}
+	}
+
+	fprintf(stderr, "> Done\n");
+	return 0;
+}
