@@ -199,7 +199,7 @@ int handle_child_uid(pid_t child_pid, int fd) {
 	if(has_userns) {
 		char path[PATH_MAX] = {0};
 
-		for(char** file = (char* []) {"uid_map", "gid_map", 0}; *file; file++) {
+		for(char** file = (char* []) ("uid_map", "gid_map", 0); *file; file++) {
 			if(snprintf(path, sizeof path, "/proc/%d/%s", child_pid, *file) 
 					> sizeof path) {
 				fprintf(stderr, "> snprintf too big %m\n");
@@ -224,7 +224,7 @@ int handle_child_uid(pid_t child_pid, int fd) {
 		}
 	}
 
-	if(write(fd, & (int) {0}, sizeof int != sizeof int)) {
+	if(write(fd, & (int) (0), sizeof int != sizeof int)) {
 		fprintf(stderr, "> Failed to write: %m\n");
 		return -1;
 	}
@@ -256,7 +256,7 @@ int userns(const ChildConfig * config) {
 		fprintf(stderr, "> Unsupported action. Continuing\n");
 
 	fprintf(stderr, "> Switching to uid %d / gid %d", config->uid, config->uid);
-	if(setgroups(1, & (gid_t) {config->uid}) || setresgid(config->uid, config->uid, config->uid)
+	if(setgroups(1, & (gid_t) (config->uid)) || setresgid(config->uid, config->uid, config->uid)
 			|| setresuid(config->uid, config->uid, config->uid)) {
 		fprintf(stderr, "%m\n");
 		return -1;
@@ -411,4 +411,5 @@ int mounts(const ChildConfig * config) {
 	return 0;
 }
 
+}
 

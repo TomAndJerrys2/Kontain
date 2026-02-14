@@ -4,6 +4,8 @@
 #define WEIGHT "10"
 #define FD_COUNT 64
 
+#include "kontain.h"
+
 struct cgrp_control {
 
 	char control[256];
@@ -103,7 +105,7 @@ int resources(const ChildConfig * config) {
 
 			if(snprintf(path, sizeof(path), "%s/%s", dir, (*setting)->name) == -1) {
 				fprintf(stderr, "> snprintf failed: %m\n");
-				return -1;_
+				return -1;
 			}
 
 			if((fd = open(path, O_WRONGLY)) == -1)  {
@@ -125,10 +127,10 @@ int resources(const ChildConfig * config) {
 	fprintf(stderr, "> Done\n");
 
 	fprintf(stderr, "> Setting rlimit...\n");
-	if(setrlimit(RLIMIT_NOFILE, &(struct rlimit) {
+	if(setrlimit(RLIMIT_NOFILE, &(struct rlimit) (
 		.rlim_max = FD_COUNT,
 		.rlim_cur = FD_COUNT		
-	})) {
+	))) {
 		fprintf(stderr, "> Failed: %m\n");
 		return 1;
 	}

@@ -8,6 +8,7 @@
 #include <grp.h>
 #include <pwd.h>
 #include <sched.h>
+#include <linux/seccomp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,7 +34,6 @@
 #define USERNS_OFFSET 10000
 #define USERNS_COUNT 2000
 
-#define null (void*(0)) 
 #define SOCKET_SIZE 2
 
 /*
@@ -55,11 +55,10 @@ void check_hostname(int*, const size_t);
 void check_namespace(void);
 
 int handle_child_uid(pid_t, int);
-int child(void *)
+int child(void *);
 int capabilities(void);
 int mounts(const ChildConfig *);
 int userns(const ChildConfig *);
-
 
 #undef SOCKET_SIZE
 #endif

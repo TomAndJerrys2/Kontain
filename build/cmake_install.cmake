@@ -1,4 +1,4 @@
-# Install script for directory: /home/kyle/Projects/Kontain
+# Install script for directory: /home/kyle/code/projects/Kontain
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/kyle/Projects/Kontain/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/kyle/code/projects/Kontain/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

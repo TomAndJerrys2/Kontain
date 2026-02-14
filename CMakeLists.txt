@@ -8,4 +8,4 @@ else()
 	add_compile_options(-Wall -Werror -lcap -lseccomp) 
 endif()
 
-add_executable(${PROJECT_NAME} kontain.c)
+add_executable(${PROJECT_NAME} kontain.c syscalls.c resources.c)

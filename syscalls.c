@@ -1,5 +1,7 @@
 #define SCMP_FAIL SCMP_ACT_ERRNO(EPERM)
 
+#include "kontain.h"
+
 int pivot_root(const char * new_root, const char * old_root) {
 	return syscall(SYS_pivot, new_root, old_root);
 }
