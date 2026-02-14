@@ -82,7 +82,7 @@ struct cgrp_control *cgrps[] = {
 	NULL
 };
 
-int resources(const ChildConfig * config) {
+int resources(ChildConfig * config) {
 	fprintf(stderr, "> Setting CGroups...\n");
 
 	for(struct cgrp_control** cgrp = cgrps; *cgrp; cgrp++) {
@@ -139,7 +139,7 @@ int resources(const ChildConfig * config) {
 	return 0;
 }
 
-int free_resources(const ChildConfig * config) {
+int free_resources(ChildConfig * config) {
 	fprintf(stderr, "> Cleaning Cgroups...\n");
 
 	for(struct cgrp_control ** cgrp = cgrps; *cgrp; cgrp++) {
