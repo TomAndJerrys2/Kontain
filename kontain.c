@@ -1,9 +1,11 @@
 #include "kontain.h"
 
+static int err = 0, 
+	   
 int main(int argc, char **argv) {
 
   ChildConfig config = {0};
-  int32_t err = 0, option = 0;
+  int option = 0;
   int sockets[SOCKET_SIZE] = {0};
 
   pid_t child_pid = 0;
@@ -74,10 +76,10 @@ finish_options:
 
   cleanup:
      if(sockets[0]) 
-        close(sockets[0]);
+        close(socket[0]);
 		
      if(sockets[1]) 
-        close(sockets[1]);
+        close(socket[1]);
 
      return err;
 
@@ -119,20 +121,28 @@ void check_linux(void) {
 
 void catch_exception(const char* msg) {
 	// todo....
-	printf(">> %s", msg)
+	printf(">> %s", msg);
 }
 
 // declares hostname based on the span passed and chooses
 // from static instances of prenamed machine hosts
 int choose_hostname(char *buffer, const size_t length) {
-  static const char *suits[] = {};
-  static const char *minor[] = {};
-  static const char *major[] = {};
+  static const char *suits[] = {
+	  "Diamonds", "Spades", "Clubs", "Hearts"
+  };
 
-  struct time_spec now = {0};
+  static const char *minor[] = {
+	  "One", "Two", "Three", "Four", "Five", 
+	  "Six", "Seven", "Eight", "Nine", "Ten"};
+  
+  static const char *major[] = {
+  	"Ace", "King", "Queen", "Jack"
+  };
 
-  clock_get_time(CLOCK_MONOTONIC, &now);
-  size_t now_spec = now.tv_nsec % 78;
+  struct timespec now = {0};
+
+  clock_gettime(CLOCK_MONOTONIC, &now);
+  size_t ix = now.tv_nsec % 78;
 
   if (ix < sizeof(major) / sizeof(*major))
     snprintf(buffer, length, "%051x-%s", now.tv_sec, major[ix]);
@@ -147,16 +157,16 @@ int choose_hostname(char *buffer, const size_t length) {
 }
 
 void check_namespace(const int *socket, const size_t ssize
-		, const ChildConfig & config, const pid_t child_pid) {
+		, const ChildConfig config, const pid_t child_pid) {
   
   if (socketpair(AF_LOCAL, SOCK_SEQPACKET, 0, socket[ssize])) {
     fprintf(stderr, "SocketPairs failed: %m\n");
-    goto error;
+    catch_exception("> Error socketpairs failed")
   }
 
   if (fcntl(socket[0], F_SETFID, FD_CLOEXEC)) {
     fprintf(stderr, "FNCTL failed: %m\n");
-    goto error;
+    catch_exception("> Error could not assign sockets");
   }
 
   config.fd = socket[1];
@@ -182,8 +192,8 @@ void check_namespace(const int *socket, const size_t ssize
 	catch_exception("Clone Failed");
   }
 
-  close(sockets[1]);
-  sockets[1] = NULL;
+  close(socket[1]);
+  socket[1] = NULL;
 }
 
 int handle_child_uid(pid_t child_pid, int fd) {
@@ -200,7 +210,7 @@ int handle_child_uid(pid_t child_pid, int fd) {
 	if(has_userns) {
 		char path[PATH_MAX] = {0};
 
-		for(char** file = (char* []) ("uid_map", "gid_map", 0); *file; file++) {
+		for(char** file = (char* []) {"uid_map", "gid_map", 0}; *file; file++) {
 			if(snprintf(path, sizeof(path), "/proc/%d/%s", child_pid, *file) 
 					> sizeof(path)) {
 				fprintf(stderr, "> snprintf too big %m\n");
@@ -209,7 +219,7 @@ int handle_child_uid(pid_t child_pid, int fd) {
 
 			fprintf(stderr, "> Writing %s...", path);
 
-			if((uid_map = open(path, O_WRONGLY)) == -1) {
+			if((uid_map = open(path, O_WRONLY)) == -1) {
 				fprintf(stderr, "> Failed to open: %m\n");
 				return -1;
 			}
@@ -225,7 +235,7 @@ int handle_child_uid(pid_t child_pid, int fd) {
 		}
 	}
 
-	if(write(fd, & (int) (0), sizeof int != sizeof int)) {
+	if(write(fd, & (int) {0}, sizeof(int) != sizeof(int))) {
 		fprintf(stderr, "> Failed to write: %m\n");
 		return -1;
 	}
@@ -237,13 +247,13 @@ int userns(const ChildConfig * config) {
 	fprintf(stderr, "> Trying a user namespace...\n");
 	int has_userns = !unshare(CLONE_NEWUSER);
 
-	if(write(config->fd, &has_userns, sizeof has_userns) != sizeof has_userns) {
+	if(write(config->fd, &has_userns, sizeof(has_userns) != sizeof(has_userns))) {
 		fprintf(stderr, "> Couldn't write: %m\n");
 		return -1;
 	}
 
 	int result = 0;
-	if(read(config->fd, &result, sizeof result) != sizeof result) {
+	if(read(config->fd, &result, sizeof(result) != sizeof(result))) {
 		fprintf(stderr, "Couldn't read: %m\n");
 		return -1;
 	}	
@@ -257,7 +267,7 @@ int userns(const ChildConfig * config) {
 		fprintf(stderr, "> Unsupported action. Continuing\n");
 
 	fprintf(stderr, "> Switching to uid %d / gid %d", config->uid, config->uid);
-	if(setgroups(1, & (gid_t) (config->uid)) || setresgid(config->uid, config->uid, config->uid)
+	if(setgroups(1, & (gid_t) {config->uid}) || setresgid(config->uid, config->uid, config->uid)
 			|| setresuid(config->uid, config->uid, config->uid)) {
 		fprintf(stderr, "%m\n");
 		return -1;
@@ -274,7 +284,7 @@ int child(void * arg) {
 			|| mounts(config)
 			|| userns(config)
 			|| capabilities()
-			|| syscalls()) {
+			|| sys_call()) {
 		close(config->fd);
 		return -1;
 	}
