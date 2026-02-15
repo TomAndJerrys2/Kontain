@@ -320,7 +320,7 @@ int capabilities() {
 		CAP_WAKE_ALARM
 	};
 
-	size_t n_caps = sizeof(drop_caps) / sizeof(*drop_caps);
+	int n_caps = sizeof(drop_caps) / sizeof(*drop_caps);
 	fprintf(stderr, "Bounding...");
 	for(size_t i = 0; i < n_caps; ++i) {
 		if(prctl(PR_CAPBSET_DROP, drop_caps[i], 0, 0, 0)) {
@@ -379,7 +379,7 @@ int mounts(const ChildConfig * config) {
 	fprintf(stderr, "> Done\n");
 	fprintf(stderr, "> Pivoting root...\n");
 
-	if(pivot_root(mount_dir, inner_mount_dir)) {
+	if(SYS_pivot_root(mount_dir, inner_mount_dir)) {
 		fprintf(stderr, "> Failed\n");
 		return -1;
 	}
@@ -397,7 +397,7 @@ int mounts(const ChildConfig * config) {
 		return -1;
 	}	
 
-	if(unmount2(old_root, MNT_DETACH)) {
+	if(umount2(old_root, MNT_DETACH)) {
 		fprintf(stderr, "> Unmount failed: %m\n");
 		return -1;
 	}
@@ -409,7 +409,5 @@ int mounts(const ChildConfig * config) {
 
 	fprintf(stderr, "> Done!\n");
 	return 0;
-}
-
 }
 

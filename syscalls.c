@@ -1,7 +1,8 @@
-#include <linux/seccomp.h>
+#define _GNU_SOURCE
 #define SCMP_FAIL SCMP_ACT_ERRNO(EPERM)
 #include "kontain.h"
 
+#include <linux/seccomp.h>
 
 int pivot_root(const char * new_root, const char * old_root) {
 	return syscall(SYS_pipe2, new_root, old_root);
