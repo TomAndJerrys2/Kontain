@@ -42,9 +42,9 @@
  * for configuring the image in the container setup
  */
 typedef struct child_config {
-	int32_t argc;
+	int argc;
 	uid_t 	uid;
-	int16_t fd;
+	int fd;
 
 	char* 	hostname;
 	char** 	argv;
@@ -67,6 +67,7 @@ int resources(ChildConfig *);
 int free_resources(ChildConfig *);
 
 int sys_call(void);
+int pivot_root(const char*, const char*);
 #undef SOCKET_SIZE
 #endif
 

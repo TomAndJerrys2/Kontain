@@ -1,5 +1,11 @@
 # ninja log v5
-4	200	1771168651196352857	CMakeFiles/kontain.c.dir/resources.c.o	faf6d098201d68dc
+4	187	1771172427032535065	build.ninja	f3b8b4ba49ba4eec
 2	128	1771168934174604127	CMakeFiles/kontain.c.dir/syscalls.c.o	a6cc5a81b7d01796
-1	109	1771169050607015773	build.ninja	f3b8b4ba49ba4eec
-4	187	1771169050607015773	build.ninja	f3b8b4ba49ba4eec
+4	200	1771168651196352857	CMakeFiles/kontain.c.dir/resources.c.o	faf6d098201d68dc
+1	75	1771172427032535065	build.ninja	f3b8b4ba49ba4eec
+5	212	1771172427264451208	CMakeFiles/kontain.h.dir/syscalls.c.o	827ef54355821d16
+6	249	1771172427299451581	CMakeFiles/kontain.h.dir/resources.c.o	c5b2608de062b453
+5	268	1771172712029403415	CMakeFiles/kontain.h.dir/syscalls.c.o	827ef54355821d16
+9	334	1771172712095404084	CMakeFiles/kontain.h.dir/resources.c.o	c5b2608de062b453
+4	133	1771172758212869887	CMakeFiles/kontain.h.dir/syscalls.c.o	827ef54355821d16
+5	237	1771172758316870934	CMakeFiles/kontain.h.dir/resources.c.o	c5b2608de062b453

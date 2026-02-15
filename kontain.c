@@ -117,8 +117,9 @@ void check_linux(void) {
   fprintf(stderr, "%s > %s\n", host.release, host.machine);
 }
 
-const char* catch_exception(const char* msg) {
+void catch_exception(const char* msg) {
 	// todo....
+	printf(">> %s", msg)
 }
 
 // declares hostname based on the span passed and chooses
@@ -320,7 +321,7 @@ int capabilities() {
 		CAP_WAKE_ALARM
 	};
 
-	int n_caps = sizeof(drop_caps) / sizeof(*drop_caps);
+	size_t n_caps = sizeof(drop_caps) / sizeof(*drop_caps);
 	fprintf(stderr, "Bounding...");
 	for(size_t i = 0; i < n_caps; ++i) {
 		if(prctl(PR_CAPBSET_DROP, drop_caps[i], 0, 0, 0)) {
@@ -379,7 +380,7 @@ int mounts(const ChildConfig * config) {
 	fprintf(stderr, "> Done\n");
 	fprintf(stderr, "> Pivoting root...\n");
 
-	if(SYS_pivot_root(mount_dir, inner_mount_dir)) {
+	if(pivot_root(mount_dir, inner_mount_dir)) {
 		fprintf(stderr, "> Failed\n");
 		return -1;
 	}

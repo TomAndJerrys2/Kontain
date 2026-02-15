@@ -36,40 +36,46 @@ include CMakeFiles/rules.ninja
 
 cmake_ninja_workdir = /home/kyle/code/projects/Kontain/build/
 # =============================================================================
-# Object build statements for EXECUTABLE target kontain.c
+# Object build statements for EXECUTABLE target kontain.h
 
 
 #############################################
-# Order-only phony target for kontain.c
+# Order-only phony target for kontain.h
 
-build cmake_object_order_depends_target_kontain.c: phony || CMakeFiles/kontain.c.dir
+build cmake_object_order_depends_target_kontain.h: phony || CMakeFiles/kontain.h.dir
 
-build CMakeFiles/kontain.c.dir/syscalls.c.o: C_COMPILER__kontain.2ec_unscanned_ /home/kyle/code/projects/Kontain/syscalls.c || cmake_object_order_depends_target_kontain.c
-  DEP_FILE = CMakeFiles/kontain.c.dir/syscalls.c.o.d
+build CMakeFiles/kontain.h.dir/kontain.c.o: C_COMPILER__kontain.2eh_unscanned_ /home/kyle/code/projects/Kontain/kontain.c || cmake_object_order_depends_target_kontain.h
+  DEP_FILE = CMakeFiles/kontain.h.dir/kontain.c.o.d
   FLAGS = -Wall -Werror -lcap -lseccomp
-  OBJECT_DIR = CMakeFiles/kontain.c.dir
-  OBJECT_FILE_DIR = CMakeFiles/kontain.c.dir
+  OBJECT_DIR = CMakeFiles/kontain.h.dir
+  OBJECT_FILE_DIR = CMakeFiles/kontain.h.dir
 
-build CMakeFiles/kontain.c.dir/resources.c.o: C_COMPILER__kontain.2ec_unscanned_ /home/kyle/code/projects/Kontain/resources.c || cmake_object_order_depends_target_kontain.c
-  DEP_FILE = CMakeFiles/kontain.c.dir/resources.c.o.d
+build CMakeFiles/kontain.h.dir/syscalls.c.o: C_COMPILER__kontain.2eh_unscanned_ /home/kyle/code/projects/Kontain/syscalls.c || cmake_object_order_depends_target_kontain.h
+  DEP_FILE = CMakeFiles/kontain.h.dir/syscalls.c.o.d
   FLAGS = -Wall -Werror -lcap -lseccomp
-  OBJECT_DIR = CMakeFiles/kontain.c.dir
-  OBJECT_FILE_DIR = CMakeFiles/kontain.c.dir
+  OBJECT_DIR = CMakeFiles/kontain.h.dir
+  OBJECT_FILE_DIR = CMakeFiles/kontain.h.dir
+
+build CMakeFiles/kontain.h.dir/resources.c.o: C_COMPILER__kontain.2eh_unscanned_ /home/kyle/code/projects/Kontain/resources.c || cmake_object_order_depends_target_kontain.h
+  DEP_FILE = CMakeFiles/kontain.h.dir/resources.c.o.d
+  FLAGS = -Wall -Werror -lcap -lseccomp
+  OBJECT_DIR = CMakeFiles/kontain.h.dir
+  OBJECT_FILE_DIR = CMakeFiles/kontain.h.dir
 
 
 # =============================================================================
-# Link build statements for EXECUTABLE target kontain.c
+# Link build statements for EXECUTABLE target kontain.h
 
 
 #############################################
-# Link the executable kontain.c
+# Link the executable kontain.h
 
-build kontain.c: C_EXECUTABLE_LINKER__kontain.2ec_ CMakeFiles/kontain.c.dir/syscalls.c.o CMakeFiles/kontain.c.dir/resources.c.o
-  OBJECT_DIR = CMakeFiles/kontain.c.dir
+build kontain.h: C_EXECUTABLE_LINKER__kontain.2eh_ CMakeFiles/kontain.h.dir/kontain.c.o CMakeFiles/kontain.h.dir/syscalls.c.o CMakeFiles/kontain.h.dir/resources.c.o
+  OBJECT_DIR = CMakeFiles/kontain.h.dir
   POST_BUILD = :
   PRE_LINK = :
-  TARGET_FILE = kontain.c
-  TARGET_PDB = kontain.c.dbg
+  TARGET_FILE = kontain.h
+  TARGET_PDB = kontain.h.dbg
 
 
 #############################################
@@ -105,7 +111,7 @@ build rebuild_cache: phony CMakeFiles/rebuild_cache.util
 #############################################
 # Folder: /home/kyle/code/projects/Kontain/build
 
-build all: phony kontain.c
+build all: phony kontain.h
 
 # =============================================================================
 # Built-in targets
