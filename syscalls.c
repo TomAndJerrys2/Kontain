@@ -1,17 +1,18 @@
+#include <linux/seccomp.h>
 #define SCMP_FAIL SCMP_ACT_ERRNO(EPERM)
-
 #include "kontain.h"
 
+
 int pivot_root(const char * new_root, const char * old_root) {
-	return syscall(SYS_pivot, new_root, old_root);
+	return syscall(SYS_pipe2, new_root, old_root);
 }
 
-int syscall() {
+int sys_call() {
 	scmp_filter_ctx ctx = NULL;
 	fprintf(stderr, "> Filtering Syscalls...\n");
 	
 	// this might just need to be a switch LMAOOO
-	if(!(ctx = seccomp_init(SCMP_ACT_ALLOW))
+	if(!(ctx = seccomp_init(SCMP_ACT_ALLOW)i)
 			|| seccomp_rule_add(ctx, SCMP_FAIL, SCMP_SYS(chmod), 1, 
 				SCMP_A1(SCMP_CMP_MASKED_EQ, S_ISUID, S_ISUID))
 			
@@ -43,7 +44,7 @@ int syscall() {
 			|| seccomp_rule_add(ctx, SCMP_FAIL, SYS_add_key, 0)
 			|| seccomp_rule_add(ctx, SCMP_FAIL, SYS_request_key, 0)
 
-			|| seccomp_rule_add(ctx, SCMP_FAIL, SYS_ptrace), 0)
+			|| seccomp_rule_add(ctx, SCMP_FAIL, SYS_ptrace, 0)
 
 			|| seccomp_rule_add(ctx, SCMP_FAIL, SYS_mbind, 0)
 			|| seccomp_rule_add(ctx, SCMP_FAIL, SYS_migrate_pages, 0)
@@ -54,16 +55,18 @@ int syscall() {
 			|| seccomp_rule_add(ctx, SCMP_FAIL, SYS_perf_event_open, 0)
 
 			|| seccomp_attr_set(ctx, SCMP_FLTATR_CTL_NNP, 0)
-			|| seccomp_load(ctx) {
-				if(ctx)
+			|| seccomp_load(ctx)) {
+				if(ctx) {
 					seccomp_release(ctx);
+				}
 
 				fprintf(stderr, "> Failed: %m\n");
 				return 1;
 			}
-	seccomp_release(ctx);
-	fprintf(stderr, "> Done.\n");
+	
+		seccomp_release(ctx);
+		fprintf(stderr, "> Done.\n");
 
-	return 0;
+		return 0;
 }
 			

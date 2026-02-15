@@ -94,13 +94,13 @@ int resources(ChildConfig * config) {
 			return -1;
 		}
 
-		if(mkdir(dir, S_IRUSR | S_IWUSER | S_IXUSER)) {
+		if(mkdir(dir, S_IRUSR | S_IWUSR | S_IXUSR)) {
 			fprintf(stderr, "mkdir %s failed: %m\n", dir);
 			return -1;
 		}
 
 		for(struct cgrp_setting** setting = (*cgrp)->settings; *setting; setting++) {
-			char path[PATH_MAX} = {0};
+			char path[PATH_MAX] = {0};
 			int fd = 0;
 
 			if(snprintf(path, sizeof(path), "%s/%s", dir, (*setting)->name) == -1) {
@@ -108,7 +108,7 @@ int resources(ChildConfig * config) {
 				return -1;
 			}
 
-			if((fd = open(path, O_WRONGLY)) == -1)  {
+			if((fd = open(path, O_WRONLY)) == -1)  {
 				fprintf(stderr, "> Opening %s failed: %m\n", path);
 				return -1;
 			}
@@ -127,10 +127,10 @@ int resources(ChildConfig * config) {
 	fprintf(stderr, "> Done\n");
 
 	fprintf(stderr, "> Setting rlimit...\n");
-	if(setrlimit(RLIMIT_NOFILE, &(struct rlimit) (
+	if(setrlimit(RLIMIT_NOFILE, &(struct rlimit) {
 		.rlim_max = FD_COUNT,
 		.rlim_cur = FD_COUNT		
-	))) {
+	})) {
 		fprintf(stderr, "> Failed: %m\n");
 		return 1;
 	}
@@ -147,21 +147,20 @@ int free_resources(ChildConfig * config) {
 		char task[PATH_MAX] = {0};
 		int task_fd = 0;
 
-		if(snprintf(dir, sizeof dir, "/sys/fs/cgroup/%s/%s",
-					(*cgrp)->control, config->hostname) == -1
-					|| snprintf(task, sizeof task, "/sys/fs/%s/tasks", 
-						(*cgrp)->control, config->hostname) == -1) {
-			fprintf(stderr, "> snprintf failed: %s\n");
+		if(snprintf(dir, sizeof(dir), "/sys/fs/cgroup/%s/%s", (*cgrp)->control, config->hostname) == -1
+					|| snprintf(task, sizeof(task), "/sys/fs/cgroup/%s/tasks", 
+						(*cgrp)->control) == -1) {
+			fprintf(stderr, "> snprintf failed\n");
 			return -1;
 		}
 
-		if((task_fd = open(task, O_WRONGLY)) == -1) {
+		if((task_fd = open(task, O_WRONLY)) == -1) {
 			fprintf(stderr, "> Opening %s\n", task);
 			return -1;
 		}
 
 		if(write(task_fd, "0", 2) == -1) {
-			fprintf(stderr, "> Writing to %s failed: %m\n");
+			fprintf(stderr, "> Writing to %s failed: %m\n", task);
 			close(task_fd);
 
 			return -1;

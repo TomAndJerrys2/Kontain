@@ -59,14 +59,14 @@ void check_namespace(void);
 int handle_child_uid(pid_t, int);
 int child(void *);
 int capabilities(const int*, const size_t, 
-		const ChildConfig &, const pid_t);
+		const ChildConfig, const pid_t);
 int mounts(const ChildConfig *);
 int userns(const ChildConfig *);
 
 int resources(ChildConfig *);
-int free_resources(ChildConfg *)
+int free_resources(ChildConfig *);
 
-int i
+int sys_call(void);
 #undef SOCKET_SIZE
 #endif
 
