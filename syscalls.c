@@ -39,22 +39,22 @@ int syscall() {
 			||  seccomp_rule_add(ctx, SCMP_FAIL, SCMP_SYS(ioctl), 1,
 				SCMP_A1(SCMP_CMP_MASKED_EQ, TIOCSTI, TIOCSTI))
 
-			|| seccomp_rule_add(ctx, SCMP_FAIL, SCMP_SYS(SYS_keyctl), 0)
-			|| seccomp_rule_add(ctx, SCMP_FAIL, SCMP_SYS(SYS_add_key), 0)
-			|| seccomp_rule_add(ctx, SCMP_FAIL, SCMP_SYS(SYS_request_key), 0)
+			|| seccomp_rule_add(ctx, SCMP_FAIL, SYS_keyctl, 0)
+			|| seccomp_rule_add(ctx, SCMP_FAIL, SYS_add_key, 0)
+			|| seccomp_rule_add(ctx, SCMP_FAIL, SYS_request_key, 0)
 
-			|| seccomp_rule_add(ctx, SCMP_FAIL, SCMP_SYS(SYS_ptrace), 0)
+			|| seccomp_rule_add(ctx, SCMP_FAIL, SYS_ptrace), 0)
 
-			|| seccomp_rule_add(ctx, SCMP_FAIL, SCMP_SYS(SYS_mbind), 0)
-			|| seccomp_rule_add(ctx, SCMP_FAIL, SCMP_SYS(SYS_migrate_pages), 0)
-			|| seccomp_rule_add(ctx, SCMP_FAIL, SCMP_SYS(SYS_move_pages), 0)
-			|| seccomp_rule_add(ctx, SCMP_FAIL, SCMP_SYS(SYS_set_mempolicy), 0)
+			|| seccomp_rule_add(ctx, SCMP_FAIL, SYS_mbind, 0)
+			|| seccomp_rule_add(ctx, SCMP_FAIL, SYS_migrate_pages, 0)
+			|| seccomp_rule_add(ctx, SCMP_FAIL, SYS_move_pages, 0)
+			|| seccomp_rule_add(ctx, SCMP_FAIL, SYS_set_mempolicy, 0)
 
-			|| seccomp_rule_add(ctx, SCMP_FAIL, SCMP_SYS(SYS_userfaultfd), 0)
-			|| seccomp_rule_add(ctx, SCMP_FAIL, SCMP_SYS(SYS_perf_event_open), 0)
+			|| seccomp_rule_add(ctx, SCMP_FAIL, SYS_userfaultfd, 0)
+			|| seccomp_rule_add(ctx, SCMP_FAIL, SYS_perf_event_open, 0)
 
-			|| seccomp_attr_set(ctx, SCMP_FLTATR_CL_NNP, 0)
-			|| seccomp_load(ctx)) {
+			|| seccomp_attr_set(ctx, SCMP_FLTATR_CTL_NNP, 0)
+			|| seccomp_load(ctx) {
 				if(ctx)
 					seccomp_release(ctx);
 
