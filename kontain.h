@@ -58,8 +58,9 @@ void check_namespace(void);
 
 int handle_child_uid(pid_t, int);
 int child(void *);
-int capabilities(const int*, const size_t, 
-		const ChildConfig, const pid_t);
+
+int capabilities();
+
 int mounts(const ChildConfig *);
 int userns(const ChildConfig *);
 

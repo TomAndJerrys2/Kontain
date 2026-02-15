@@ -190,7 +190,7 @@ int handle_child_uid(pid_t child_pid, int fd) {
 	int uid_map = 0;
 	int has_userns = -1;
 
-	if(read(fd, &has_userns, sizeof has_userns) != sizeof has_userns) {
+	if(read(fd, &has_userns, sizeof(has_userns) != sizeof(has_userns))) {
 		fprintf(stderr, "> Couldn't read from child\n");
 		catch_exception("Child not Cloned\n");
 
@@ -201,8 +201,8 @@ int handle_child_uid(pid_t child_pid, int fd) {
 		char path[PATH_MAX] = {0};
 
 		for(char** file = (char* []) ("uid_map", "gid_map", 0); *file; file++) {
-			if(snprintf(path, sizeof path, "/proc/%d/%s", child_pid, *file) 
-					> sizeof path) {
+			if(snprintf(path, sizeof(path), "/proc/%d/%s", child_pid, *file) 
+					> sizeof(path)) {
 				fprintf(stderr, "> snprintf too big %m\n");
 				return -1;
 			}
@@ -221,7 +221,7 @@ int handle_child_uid(pid_t child_pid, int fd) {
 				return -1;
 			}
 
-			close(uid_map;)
+			close(uid_map);
 		}
 	}
 
@@ -309,13 +309,13 @@ int capabilities() {
 		CAP_MAC_OVERRIDE,
 		CAP_MKNOD,
 		CAP_SETFCAP,
-		CAP_SYS_LOG,
+		CAP_SYSLOG,
 		CAP_SYS_ADMIN,
 		CAP_SYS_BOOT,
 		CAP_SYS_MODULE,
 		CAP_SYS_NICE,
 
-		CAP_SYS_RAWID,
+		CAP_SYS_RAWIO,
 		CAP_SYS_RESOURCE,
 		CAP_SYS_TIME,
 		CAP_WAKE_ALARM
@@ -331,8 +331,8 @@ int capabilities() {
 	}
 
 	fprintf(stderr, "> Inheritable...");
-	caps_t caps = NULL;
-	if(!(caps = caps_get_proc()) || cap_set_flag(caps, CAP_INHERITABLE, n_caps, drop_caps, CAP_CLEAR) 
+	cap_t caps = NULL;
+	if(!(caps = cap_get_proc()) || cap_set_flag(caps, CAP_INHERITABLE, n_caps, drop_caps, CAP_CLEAR) 
 			|| cap_set_proc(caps)) {
 
 		fprintf(stderr, "> Failed: %m\n");
