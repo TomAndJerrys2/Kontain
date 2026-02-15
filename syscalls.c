@@ -12,7 +12,7 @@ int sys_call() {
 	fprintf(stderr, "> Filtering Syscalls...\n");
 	
 	// this might just need to be a switch LMAOOO
-	if(!(ctx = seccomp_init(SCMP_ACT_ALLOW)i)
+	if(!(ctx = seccomp_init(SCMP_ACT_ALLOW))
 			|| seccomp_rule_add(ctx, SCMP_FAIL, SCMP_SYS(chmod), 1, 
 				SCMP_A1(SCMP_CMP_MASKED_EQ, S_ISUID, S_ISUID))
 			
